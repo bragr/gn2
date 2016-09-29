@@ -7,66 +7,52 @@ import (
 	"os"
 )
 
-type Neuron struct {
-	NumInputs   int64
-	EdgeWeights []float64
-}
-
-type NLayer struct {
-	NumNeurons int64
-	Neurons    []*Neuron
-}
-
-type NNet struct {
-	NumInputs       int64
-	NumOutputs      int64
-	NumLayers       int64
-	NumNeuronsLayer int64
-	NeuronLayer     []*NLayer
-}
+type (
+    neuron []float64
+    nLayer []neuron
+    neuralNet []nLayer
+)
 
 func randWeight() float64 {
 	return rand.Float64() - rand.Float64()
 }
 
-func NewNeuron(numInputs int64) *Neuron {
-	nn := new(Neuron)
-	nn.NumInputs = numInputs
-
+func NewNeuron(numInputs int64) neuron {
+	var n neuron
 	for i := int64(0); i < numInputs; i++ {
-		nn.EdgeWeights = append(nn.EdgeWeights, randWeight())
+		n = append(n, randWeight())
 	}
-	return nn
+	return n
 }
 
-func NewNeuronLayer(numNeurons int64, numInputs int64) *NLayer {
-	layer := new(NLayer)
+func NewNeuronLayer(numNeurons int64, numInputs int64) nLayer {
+	var layer nLayer
 	for i := int64(0); i < numNeurons; i++ {
-		layer.Neurons = append(layer.Neurons, NewNeuron(numInputs))
+		layer = append(layer, NewNeuron(numInputs))
 	}
 	return layer
 }
 
-func NewNeuralNet(numInputs int64, numOutputs int64, numHiddenLayers int64, numNeuronsPerLayer int64) *NNet {
-	net := &NNet{NumInputs: numInputs, NumOutputs: numOutputs, NumLayers: numHiddenLayers, NumNeuronsLayer: numNeuronsPerLayer}
+func NewNeuralNet(numInputs int64, numOutputs int64, numHiddenLayers int64, numNeuronsPerLayer int64) neuralNet {
+    var net neuralNet
 	if numHiddenLayers > 0 {
-		net.NeuronLayer = append(net.NeuronLayer, NewNeuronLayer(numNeuronsPerLayer, numInputs))
+		net = append(net, NewNeuronLayer(numNeuronsPerLayer, numInputs))
 		for i := int64(0); i < numHiddenLayers-1; i++ {
-			net.NeuronLayer = append(net.NeuronLayer, NewNeuronLayer(numNeuronsPerLayer, numNeuronsPerLayer))
+			net = append(net, NewNeuronLayer(numNeuronsPerLayer, numNeuronsPerLayer))
 		}
-		net.NeuronLayer = append(net.NeuronLayer, NewNeuronLayer(numOutputs, numNeuronsPerLayer))
+		net = append(net, NewNeuronLayer(numOutputs, numNeuronsPerLayer))
 	} else {
-		net.NeuronLayer = append(net.NeuronLayer, NewNeuronLayer(numOutputs, numInputs))
+		net = append(net, NewNeuronLayer(numOutputs, numInputs))
 	}
 	return net
 }
 
-func (n *NNet) getWeights() []float64 {
+func (net neuralNet) getWeights() []float64 {
 	weights := make([]float64, 0)
 
-	for _, layer := range n.NeuronLayer {
-		for _, neuron := range layer.Neurons {
-			for _, weight := range neuron.EdgeWeights {
+	for _, layer := range net {
+		for _, neuron := range layer {
+			for _, weight := range neuron {
 				weights = append(weights, weight)
 			}
 		}
@@ -74,43 +60,34 @@ func (n *NNet) getWeights() []float64 {
 	return weights
 }
 
-func (n *NNet) setWeights(newWeights []float64) {
+func (net neuralNet) setWeights(newWeights []float64) {
 	index := 0
-	for x, _ := range n.NeuronLayer {
-		for y, _ := range n.NeuronLayer[x].Neurons {
-			for z, _ := range n.NeuronLayer[x].Neurons[y].EdgeWeights {
-				n.NeuronLayer[x].Neurons[y].EdgeWeights[z] = newWeights[index]
+	for l, _ := range net {
+		for n, _ := range net[l] {
+			for e, _ := range net[l][n] {
+				net[l][n][e] = newWeights[index]
 				index++
 			}
 		}
 	}
 }
 
-func (n *NNet) printNet() {
-	for c, layer := range n.NeuronLayer {
-		fmt.Printf("Layer: %d (%d neurons)\n", c, len(layer.Neurons))
-		for i, neuron := range layer.Neurons {
+func (net neuralNet) printNet() {
+	for c, layer := range net {
+		fmt.Printf("Layer: %d (%d neurons)\n", c, len(layer))
+		for i, neuron := range layer {
 			fmt.Printf("Neuron: %d\n", i)
-			for _, weight := range neuron.EdgeWeights {
+			for _, weight := range neuron {
 				fmt.Println(weight)
 			}
 		}
 	}
 }
 
-func (n *NNet) update(inputs []float64) []float64 {
+func (net neuralNet) update(inputs []float64) []float64 {
 	outputs := make([]float64, 1)
-	if len(inputs) != n.NumInputs {
+	if len(inputs) != len(net) {
 		return outputs
-	}
-	for i := int64(0); i < n.NumNeuronsLayer+1; i++ {
-		if i > 0 {
-			inputs = outputs
-		}
-		outputs := make([]float64, 1)
-		weightIndex := 0
-		for j := int64(0); j < len(n.NeuronLayer[i].Neurons); j++ {
-		}
 	}
 
 	return outputs

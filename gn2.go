@@ -78,8 +78,12 @@ func (net neuralNet) printNet() {
 		fmt.Printf("Layer: %d (%d neurons)\n", c, len(layer))
 		for i, neuron := range layer {
 			fmt.Printf("Neuron: %d\n", i)
-			for _, weight := range neuron {
-				fmt.Println(weight)
+			for i, weight := range neuron {
+				if i == len(neuron)-1 {
+					fmt.Printf("Bias: %f\n", weight)
+				} else {
+					fmt.Println(weight)
+				}
 			}
 		}
 	}
@@ -87,14 +91,19 @@ func (net neuralNet) printNet() {
 
 func sigmoid(input float64) float64 {
 	p := 1.0
-	return 1 / (1 + math.Exp(-1*input/p))
+	return 1.0 / (1.0 + math.Exp(-1*input/p))
+}
+
+func (n neuron) bias() float64 {
+	return n[len(n)-1]
 }
 
 func (n neuron) updateNeuron(inputs []float64) float64 {
 	var output float64 = 0.0
-	for i, weight := range n {
-		output += weight * inputs[i]
+	for i := 0; i < len(n)-1; i++ {
+		output += n[i] * inputs[i]
 	}
+	output -= n.bias()
 	return sigmoid(output)
 }
 
@@ -140,17 +149,20 @@ func seedRand() {
 func main() {
 	seedRand()
 
-	net := NewNeuralNet(1, 1, 3, 10)
+	net := NewNeuralNet(1, 1, 2, 10)
 	net.printNet()
 
-	w := net.getWeights()
+	var inputs [11]float64
+	var answers [11]float64
 
-	derp := make([]float64, 0)
-	for i := 0; i < len(w); i++ {
-		derp = append(derp, float64(i))
+	for i := 0; i <= 10; i++ {
+		x := float64(i) / 10.0
+		inputs[i] = x
+		answers[i] = 1 - x
 	}
-	net.setWeights(derp)
-	net.printNet()
-	net.setWeights(w)
-	net.printNet()
+
+	for i, input := range inputs {
+		fmt.Printf("Input: %f Output: %f Expecting: %f\n", input, net.update([]float64{input})[0], answers[i])
+	}
+
 }

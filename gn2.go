@@ -3,15 +3,15 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-    "math"
+	"math"
 	"math/rand"
 	"os"
 )
 
 type (
-    neuron []float64
-    nLayer []neuron
-    neuralNet []nLayer
+	neuron    []float64
+	nLayer    []neuron
+	neuralNet []nLayer
 )
 
 func randWeight() float64 {
@@ -20,7 +20,7 @@ func randWeight() float64 {
 
 func NewNeuron(numInputs int64) neuron {
 	var n neuron
-	for i := int64(0); i < numInputs; i++ {
+	for i := int64(0); i < numInputs+1; i++ {
 		n = append(n, randWeight())
 	}
 	return n
@@ -35,7 +35,7 @@ func NewNeuronLayer(numNeurons int64, numInputs int64) nLayer {
 }
 
 func NewNeuralNet(numInputs int64, numOutputs int64, numHiddenLayers int64, numNeuronsPerLayer int64) neuralNet {
-    var net neuralNet
+	var net neuralNet
 	if numHiddenLayers > 0 {
 		net = append(net, NewNeuronLayer(numNeuronsPerLayer, numInputs))
 		for i := int64(0); i < numHiddenLayers-1; i++ {
@@ -86,34 +86,33 @@ func (net neuralNet) printNet() {
 }
 
 func sigmoid(input float64) float64 {
-    p := 1.0
-    return 1 / ( 1 + math.Exp(-1*input/p))
+	p := 1.0
+	return 1 / (1 + math.Exp(-1*input/p))
 }
 
 func (n neuron) updateNeuron(inputs []float64) float64 {
-    var output float64 = 0.0
-    for i, weight := range n {
-        output += weight * inputs[i]
-    }
-    return sigmoid(output)
+	var output float64 = 0.0
+	for i, weight := range n {
+		output += weight * inputs[i]
+	}
+	return sigmoid(output)
 }
 
 func (layer nLayer) updateLayer(inputs []float64) []float64 {
-    var output []float64
-    for _, n := range layer {
-        output = append(output, n.updateNeuron(inputs))
-    }
-    return output
+	var output []float64
+	for _, n := range layer {
+		output = append(output, n.updateNeuron(inputs))
+	}
+	return output
 }
 
 func (net neuralNet) update(inputs []float64) []float64 {
 	var outputs []float64
 
-
-    for _, layer := range net {
-        outputs = layer.updateLayer(inputs)
-        inputs = outputs
-    }
+	for _, layer := range net {
+		outputs = layer.updateLayer(inputs)
+		inputs = outputs
+	}
 
 	return outputs
 }

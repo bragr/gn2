@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
+    "math"
 	"math/rand"
 	"os"
 )
@@ -84,11 +85,35 @@ func (net neuralNet) printNet() {
 	}
 }
 
+func sigmoid(input float64) float64 {
+    p := 1.0
+    return 1 / ( 1 + math.Exp(-1*input/p))
+}
+
+func (n neuron) updateNeuron(inputs []float64) float64 {
+    var output float64 = 0.0
+    for i, weight := range n {
+        output += weight * inputs[i]
+    }
+    return sigmoid(output)
+}
+
+func (layer nLayer) updateLayer(inputs []float64) []float64 {
+    var output []float64
+    for _, n := range layer {
+        output = append(output, n.updateNeuron(inputs))
+    }
+    return output
+}
+
 func (net neuralNet) update(inputs []float64) []float64 {
-	outputs := make([]float64, 1)
-	if len(inputs) != len(net) {
-		return outputs
-	}
+	var outputs []float64
+
+
+    for _, layer := range net {
+        outputs = layer.updateLayer(inputs)
+        inputs = outputs
+    }
 
 	return outputs
 }

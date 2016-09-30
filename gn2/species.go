@@ -3,7 +3,9 @@
 // See LICENSE.TXT
 package gn2
 
-import ()
+import (
+	"math"
+)
 
 // An individual neurala and its fitness
 type genome struct {
@@ -24,4 +26,14 @@ func (s Species) Swap(i, j int) {
 }
 func (s Species) Less(i, j int) bool {
 	return s[i].Fitness < s[j].Fitness
+}
+
+// Feed the given input to all genomes in the species and judge their fitness
+// against the answers
+func (s Species) Compete(inputs, answers []float64) {
+	for g, _ := range s {
+		for i, input := range inputs {
+			s[g].Fitness += math.Abs(answers[i] - s[g].Net.Update([]float64{input})[0])
+		}
+	}
 }

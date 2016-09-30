@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"github.com/bragr/gn2/gn2"
-	"math"
 	"math/rand"
 	"sort"
 )
@@ -27,16 +26,12 @@ func main() {
 	species := make(gn2.Species, 20)
 	for i, _ := range species {
 		species[i].Fitness = 0.0
-		species[i].Net = gn2.NewNeuralNet(1, 1, 3, 10)
+		species[i].Net = gn2.NewNeuralNet(1, 1, 4, 15)
 	}
 
 	for i := 0; i < 1000; i++ {
 		fmt.Printf(".")
-		for c, _ := range species {
-			for y, input := range inputs {
-				species[c].Fitness += math.Abs(answers[y] - species[c].Net.Update([]float64{input})[0])
-			}
-		}
+		species.Compete(inputs, answers)
 
 		// Get best 5 nets, make 3 mutated children for each, and start again
 		sort.Sort(species)

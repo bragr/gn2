@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"sort"
 )
 
 type (
@@ -126,6 +127,21 @@ func (net neuralNet) update(inputs []float64) []float64 {
 	return outputs
 }
 
+func (net neuralNet) mutate(mutationRate, maxPerturbation float64, numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) neuralNet {
+	mutatedNet := NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer)
+
+	genome := net.getWeights()
+
+	for i, _ := range genome {
+		if rand.Float64() < mutationRate {
+			genome[i] += randWeight() * maxPerturbation
+		}
+	}
+	mutatedNet.setWeights(genome)
+
+	return mutatedNet
+}
+
 func seedRand() {
 	f, err := os.Open("/dev/urandom")
 	if err != nil {
@@ -146,23 +162,64 @@ func seedRand() {
 	rand.Seed(seed64)
 }
 
+type chromosome struct {
+	Fitness float64
+	Net     neuralNet
+}
+type Species []chromosome
+
+func (s Species) Len() int {
+	return len(s)
+}
+func (s Species) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s Species) Less(i, j int) bool {
+	return s[i].Fitness < s[j].Fitness
+}
+
 func main() {
 	seedRand()
 
-	net := NewNeuralNet(1, 1, 2, 10)
-	net.printNet()
-
 	var inputs [11]float64
 	var answers [11]float64
-
 	for i := 0; i <= 10; i++ {
 		x := float64(i) / 10.0
 		inputs[i] = x
 		answers[i] = 1 - x
 	}
 
+	species := make(Species, 20)
+	for i, _ := range species {
+		species[i].Fitness = 0.0
+		species[i].Net = NewNeuralNet(1, 1, 3, 10)
+	}
+
+	for i := 0; i < 100000; i++ {
+		fmt.Printf(".")
+		for c, _ := range species {
+			for y, input := range inputs {
+				species[c].Fitness += math.Abs(answers[y] - species[c].Net.update([]float64{input})[0])
+			}
+		}
+
+		// Get best 5 nets, make 3 mutated children for each, and start again
+		sort.Sort(species)
+		for chromo := 0; chromo < 5; chromo++ {
+			species[chromo].Fitness = 0.0
+			species[3*chromo+5].Fitness = 0.0
+			species[3*chromo+5].Net = species[chromo].Net.mutate(0.025, 0.3, 1, 1, 3, 10)
+			species[3*chromo+6].Fitness = 0.0
+			species[3*chromo+6].Net = species[chromo].Net.mutate(0.05, 0.3, 1, 1, 3, 10)
+			species[3*chromo+7].Fitness = 0.0
+			species[3*chromo+7].Net = species[chromo].Net.mutate(0.1, 0.3, 1, 1, 3, 10)
+		}
+	}
+	fmt.Println()
+
+	species[0].Net.printNet()
 	for i, input := range inputs {
-		fmt.Printf("Input: %f Output: %f Expecting: %f\n", input, net.update([]float64{input})[0], answers[i])
+		fmt.Printf("Input: %f, Output: %f, Answer: %f\n", input, species[0].Net.update([]float64{input})[0], answers[i])
 	}
 
 }

@@ -6,6 +6,7 @@ package gn2
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 )

@@ -195,7 +195,7 @@ func main() {
 		species[i].Net = NewNeuralNet(1, 1, 3, 10)
 	}
 
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 10000; i++ {
 		fmt.Printf(".")
 		for c, _ := range species {
 			for y, input := range inputs {

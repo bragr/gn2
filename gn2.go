@@ -1,3 +1,6 @@
+// Copyright (c) 2016 Grant Brady
+// Licensed under the MIT License
+// See LICENSE.TXT
 package main
 
 import (

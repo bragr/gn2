@@ -8,7 +8,7 @@ import ()
 // An individual neurala and its fitness
 type genome struct {
 	Fitness float64
-	Net     neuralNet
+	Net     NeuralNet
 }
 
 // A species consists of a set of genomes

@@ -5,7 +5,7 @@ package gn2
 
 import (
 	"fmt"
-	"sort"
+	"math/rand"
 )
 
 //
@@ -71,7 +71,7 @@ type NeuralNet []nLayer
 // Neural net factory. Creates a net that takes numInputs inputs, numOutputs
 // outputs, with numHiddenLayers hidden layers, and numNeuronPerLayer neurons
 // in the hidden layers
-func NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer) NeuralNet {
+func NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) NeuralNet {
 	var net NeuralNet
 	if numHiddenLayers > 0 {
 		net = append(net, newNeuronLayer(numNeuronsPerLayer, numInputs))
@@ -144,7 +144,7 @@ func (net NeuralNet) Update(inputs []float64) []float64 {
 	return outputs
 }
 
-func (net NeuralNet) Mutate(mutationRate, maxPerturbation float64, numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) neuralNet {
+func (net NeuralNet) Mutate(mutationRate, maxPerturbation float64, numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) NeuralNet {
 	mutatedNet := NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer)
 
 	genome := net.GetWeights()

@@ -5,12 +5,17 @@ package gn2
 
 import ()
 
-type chromosome struct {
+// An individual neurala and its fitness
+type genome struct {
 	Fitness float64
 	Net     neuralNet
 }
-type Species []chromosome
 
+// A species consists of a set of genomes
+type Species []genome
+
+// Let(), Swap(), and Less() implement the sort prototype to sort based on
+// fitness
 func (s Species) Len() int {
 	return len(s)
 }

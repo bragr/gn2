@@ -9,5 +9,4 @@ but it may be helpful to you if you are just getting started with neural network
 * Hardware acceleration? (Possible, but unlikely in the near term. There does seem to be some CUDA support for Go)
 * Move params and magic numbers into one place and make them easily configurable by command lines args or config files 
 * Add support for loading and saving nets (and possible whole species) to files
-** Either in some sort of json format or maybe Python pickling depending on what works best
-
+ * Either in some sort of json format or maybe Python pickling depending on what works best

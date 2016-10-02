@@ -11,15 +11,23 @@ import (
 	"os"
 )
 
+var needSeed bool = true
+
+// Return a random float64 -1.0 <= n <= 1 but only if rand has been seeded
 func randWeight() float64 {
+	if needSeed {
+		SeedRand()
+	}
 	return rand.Float64() - rand.Float64()
 }
 
+// Normalize the output of the nodes
 func sigmoid(input float64) float64 {
 	p := 1.0
 	return 1.0 / (1.0 + math.Exp(-1*input/p))
 }
 
+// Seed random from system entropy. Unix systems only
 func SeedRand() {
 	f, err := os.Open("/dev/urandom")
 	if err != nil {

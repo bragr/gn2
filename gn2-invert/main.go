@@ -39,11 +39,11 @@ func main() {
 		for chromo := 0; chromo < 5; chromo++ {
 			species[chromo].Fitness = 0.0
 			species[3*chromo+5].Fitness = 0.0
-			species[3*chromo+5].Net = species[chromo].Net.Mutate(0.025, 0.3, 1, 1, 3, 10)
+			species[3*chromo+5].Net = species[chromo].Net.Mutate(0.025, 0.3, 1, 1, 4, 15)
 			species[3*chromo+6].Fitness = 0.0
-			species[3*chromo+6].Net = species[chromo].Net.Mutate(0.05, 0.3, 1, 1, 3, 10)
+			species[3*chromo+6].Net = species[chromo].Net.Mutate(0.05, 0.3, 1, 1, 4, 15)
 			species[3*chromo+7].Fitness = 0.0
-			species[3*chromo+7].Net = species[chromo].Net.Mutate(0.1, 0.3, 1, 1, 3, 10)
+			species[3*chromo+7].Net = species[chromo].Net.Mutate(0.1, 0.3, 1, 1, 4, 15)
 		}
 	}
 	fmt.Println()

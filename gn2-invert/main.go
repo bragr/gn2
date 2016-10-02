@@ -1,6 +1,5 @@
-// Copyright (c) 2016 Grant Brady
-// Licensed under the MIT License
-// See LICENSE.TXT
+// main.go Copyright (c) 2016 Grant Brady
+// Licensed under the MIT License. See LICENSE.TXT
 package main
 
 import (
@@ -11,24 +10,25 @@ import (
 )
 
 func main() {
+	// Seed rand from system entropy source
 	gn2.SeedRand()
 
-	inputs := make([]float64, 100)
-	for i := 0; i < 100; i++ {
+	// Make the training data set. In this case a simple inversion
+	traingSetSize := 1000
+	inputs := make([]float64, traingSetSize)
+	for i := 0; i < traingSetSize; i++ {
 		inputs[i] = rand.Float64()
 	}
 	sort.Sort(sort.Float64Slice(inputs))
-	answers := make([]float64, 100)
-	for i := 0; i < len(inputs); i++ {
+	answers := make([]float64, traingSetSize)
+	for i := 0; i < traingSetSize; i++ {
 		answers[i] = 1 - inputs[i]
 	}
 
-	species := make(gn2.Species, 20)
-	for i, _ := range species {
-		species[i].Fitness = 0.0
-		species[i].Net = gn2.NewNeuralNet(1, 1, 4, 15)
-	}
+	// Make a new "species" to train on
+	species := gn2.NewSpecies(20, 1, 1, 4, 15)
 
+	// Train the species
 	for i := 0; i < 1000; i++ {
 		fmt.Printf(".")
 		species.Compete(inputs, answers)
@@ -47,6 +47,7 @@ func main() {
 	}
 	fmt.Println()
 
+	// Print the results for the winner
 	species[0].Net.PrintNet()
 	for i, input := range inputs {
 		output := species[0].Net.Update([]float64{input})[0]

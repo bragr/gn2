@@ -144,6 +144,7 @@ func (net NeuralNet) Update(inputs []float64) []float64 {
 	return outputs
 }
 
+// Make a copy of the neural net and mutate it according to the specified settings
 func (net NeuralNet) Mutate(mutationRate, maxPerturbation float64, numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) NeuralNet {
 	mutatedNet := NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer)
 

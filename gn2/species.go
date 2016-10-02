@@ -7,14 +7,38 @@ import (
 	"math"
 )
 
-// An individual neurala and its fitness
+// An individual neural net and its fitness
 type genome struct {
-	Fitness float64
-	Net     NeuralNet
+	Fitness            float64
+	Net                NeuralNet
+	netInputs          int64
+	netOutputs         int64
+	netHiddenLayers    int64
+	netNeuronsPerLayer int64
+}
+
+// Genome factory
+func newGenome(inputs, outputs, layers, neuronsPerLayer int64) genome {
+	return genome{
+		Fitness:            0.0,
+		Net:                NewNeuralNet(inputs, outputs, layers, neuronsPerLayer),
+		netInputs:          inputs,
+		netOutputs:         outputs,
+		netHiddenLayers:    layers,
+		netNeuronsPerLayer: neuronsPerLayer}
 }
 
 // A species consists of a set of genomes
 type Species []genome
+
+// Species factory
+func NewSpecies(population, inputs, outputs, layers, neuronsPerLayer int64) Species {
+	var species Species
+	for i := int64(0); i < population; i++ {
+		species = append(species, newGenome(inputs, outputs, layers, neuronsPerLayer))
+	}
+	return species
+}
 
 // Let(), Swap(), and Less() implement the sort prototype to sort based on
 // fitness

@@ -22,7 +22,7 @@ type genome struct {
 func newGenome(inputs, outputs, layers, neuronsPerLayer int64) genome {
 	return genome{
 		Fitness:            0.0,
-		Net:                NewNeuralNet(inputs, outputs, layers, neuronsPerLayer),
+		Net:                NewNeuralNet(inputs, outputs, layers, neuronsPerLayer, true),
 		netInputs:          inputs,
 		netOutputs:         outputs,
 		netHiddenLayers:    layers,
@@ -130,6 +130,6 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 	// New random nets (filler)
 	for ; newPop < int64(len(s)); newPop++ {
 		s[newPop].Fitness = 0.0
-		s[newPop].Net = NewNeuralNet(s[newPop].netInputs, s[newPop].netOutputs, s[newPop].netHiddenLayers, s[newPop].netNeuronsPerLayer)
+		s[newPop].Net = NewNeuralNet(s[newPop].netInputs, s[newPop].netOutputs, s[newPop].netHiddenLayers, s[newPop].netNeuronsPerLayer, true)
 	}
 }

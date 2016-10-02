@@ -15,11 +15,17 @@ type neuron []float64
 
 // Basic neuron factory. Creates a neuron with numInputs input with randomized
 // input weights and neuron bias.
-func newNeuron(numInputs int64) neuron {
+func newNeuron(numInputs int64, randomized bool) neuron {
 	var n neuron
 	// One extra for the bias
-	for i := int64(0); i < numInputs+1; i++ {
-		n = append(n, randWeight())
+	if randomized {
+		for i := int64(0); i < numInputs+1; i++ {
+			n = append(n, randWeight())
+		}
+	} else {
+		for i := int64(0); i < numInputs+1; i++ {
+			n = append(n, 0.0)
+		}
 	}
 	return n
 }
@@ -46,10 +52,10 @@ type nLayer []neuron
 
 // Basic neuron layer factory. Create numNeurons neurons each taking numInputs
 // inputs
-func newNeuronLayer(numNeurons, numInputs int64) nLayer {
+func newNeuronLayer(numNeurons, numInputs int64, randomized bool) nLayer {
 	var layer nLayer
 	for i := int64(0); i < numNeurons; i++ {
-		layer = append(layer, newNeuron(numInputs))
+		layer = append(layer, newNeuron(numInputs, randomized))
 	}
 	return layer
 }
@@ -71,16 +77,16 @@ type NeuralNet []nLayer
 // Neural net factory. Creates a net that takes numInputs inputs, numOutputs
 // outputs, with numHiddenLayers hidden layers, and numNeuronPerLayer neurons
 // in the hidden layers
-func NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) NeuralNet {
+func NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64, randomized bool) NeuralNet {
 	var net NeuralNet
 	if numHiddenLayers > 0 {
-		net = append(net, newNeuronLayer(numNeuronsPerLayer, numInputs))
+		net = append(net, newNeuronLayer(numNeuronsPerLayer, numInputs, randomized))
 		for i := int64(0); i < numHiddenLayers-1; i++ {
-			net = append(net, newNeuronLayer(numNeuronsPerLayer, numNeuronsPerLayer))
+			net = append(net, newNeuronLayer(numNeuronsPerLayer, numNeuronsPerLayer, randomized))
 		}
-		net = append(net, newNeuronLayer(numOutputs, numNeuronsPerLayer))
+		net = append(net, newNeuronLayer(numOutputs, numNeuronsPerLayer, randomized))
 	} else {
-		net = append(net, newNeuronLayer(numOutputs, numInputs))
+		net = append(net, newNeuronLayer(numOutputs, numInputs, randomized))
 	}
 	return net
 }
@@ -146,7 +152,7 @@ func (net NeuralNet) Update(inputs []float64) []float64 {
 
 // Make a copy of the neural net and mutate it according to the specified settings
 func (net NeuralNet) Mutate(mutationRate, maxPerturbation float64, numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer int64) NeuralNet {
-	mutatedNet := NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer)
+	mutatedNet := NewNeuralNet(numInputs, numOutputs, numHiddenLayers, numNeuronsPerLayer, false)
 
 	genome := net.GetWeights()
 

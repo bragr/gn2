@@ -3,7 +3,6 @@ Simple neural net and genetic algorithm implemented in Go. This is not a serious
 but it may be helpful to you if you are just getting started with neural networks (as I am).
 
 ## Todo (in no particular order)
-* Comment all the things (hopefully the source will be able to act a mini neural network tutorial
 * Add support for backpropagation in addition to genetic algorithm
 * Add support for executing multiple networks simultaneously using goroutines
 * Create an interface for training sets/problems to allow new ones to be created more simply

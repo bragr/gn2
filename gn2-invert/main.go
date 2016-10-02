@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/bragr/gn2/gn2"
 	"math/rand"
-	"sort"
 )
 
 // Make the training data set. In this case a simple inversion
@@ -33,18 +32,7 @@ func main() {
 			fmt.Printf(".")
 		}
 		species.Compete(genTraingingData(1000))
-
-		// Get best 5 nets, make 3 mutated children for each, and start again
-		sort.Sort(species)
-		for chromo := 0; chromo < 5; chromo++ {
-			species[chromo].Fitness = 0.0
-			species[3*chromo+5].Fitness = 0.0
-			species[3*chromo+5].Net = species[chromo].Net.Mutate(0.025, 0.3, 1, 1, 4, 15)
-			species[3*chromo+6].Fitness = 0.0
-			species[3*chromo+6].Net = species[chromo].Net.Mutate(0.05, 0.3, 1, 1, 4, 15)
-			species[3*chromo+7].Fitness = 0.0
-			species[3*chromo+7].Net = species[chromo].Net.Mutate(0.1, 0.3, 1, 1, 4, 15)
-		}
+		species.Breed(5, 3, 0)
 	}
 	fmt.Println()
 

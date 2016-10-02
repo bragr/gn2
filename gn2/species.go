@@ -54,10 +54,13 @@ func (s Species) Less(i, j int) bool {
 
 // Feed the given input to all genomes in the species and judge their fitness
 // against the answers
-func (s Species) Compete(inputs, answers []float64) {
+func (s Species) Compete(inputs, answers [][]float64) {
 	for g, _ := range s {
 		for i, input := range inputs {
-			s[g].Fitness += math.Abs(answers[i] - s[g].Net.Update([]float64{input})[0])
+			outputs := s[g].Net.Update(input)
+			for j, _ := range outputs {
+				s[g].Fitness += math.Abs(answers[i][j] - outputs[j])
+			}
 		}
 	}
 }

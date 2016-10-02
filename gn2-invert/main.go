@@ -9,29 +9,30 @@ import (
 	"sort"
 )
 
+// Make the training data set. In this case a simple inversion
+func genTraingingData(dataSize int64) (inputs, outputs [][]float64) {
+	for i := int64(0); i < dataSize; i++ {
+		inputs = append(inputs, []float64{rand.Float64()})
+	}
+	for i := int64(0); i < dataSize; i++ {
+		outputs = append(outputs, []float64{1.0 - inputs[i][0]})
+	}
+	return inputs, outputs
+}
+
 func main() {
 	// Seed rand from system entropy source
 	gn2.SeedRand()
-
-	// Make the training data set. In this case a simple inversion
-	traingSetSize := 1000
-	inputs := make([]float64, traingSetSize)
-	for i := 0; i < traingSetSize; i++ {
-		inputs[i] = rand.Float64()
-	}
-	sort.Sort(sort.Float64Slice(inputs))
-	answers := make([]float64, traingSetSize)
-	for i := 0; i < traingSetSize; i++ {
-		answers[i] = 1 - inputs[i]
-	}
 
 	// Make a new "species" to train on
 	species := gn2.NewSpecies(20, 1, 1, 4, 15)
 
 	// Train the species
 	for i := 0; i < 1000; i++ {
-		fmt.Printf(".")
-		species.Compete(inputs, answers)
+		if i%10 == 0 {
+			fmt.Printf(".")
+		}
+		species.Compete(genTraingingData(1000))
 
 		// Get best 5 nets, make 3 mutated children for each, and start again
 		sort.Sort(species)
@@ -49,9 +50,10 @@ func main() {
 
 	// Print the results for the winner
 	species[0].Net.PrintNet()
+	inputs, outputs := genTraingingData(1000)
 	for i, input := range inputs {
-		output := species[0].Net.Update([]float64{input})[0]
-		fmt.Printf("Input: %f, Output: %f, Answer: %f Difference: %f%%\n", input, output, answers[i], output/answers[i])
+		output := species[0].Net.Update(input)[0]
+		fmt.Printf("Input: %f, Output: %f, Answer: %f Difference: %f%%\n", input[0], output, outputs[i][0], output/outputs[i][0])
 	}
 
 }

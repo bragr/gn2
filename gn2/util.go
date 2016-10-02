@@ -40,10 +40,12 @@ func SeedRand() {
 		fmt.Printf("Failed to read random source: %s\n", err)
 		os.Exit(1)
 	}
+	f.Close()
 	if i != 8 {
 		fmt.Printf("Was expecting to read 8 bytes of seeds, read %d bytes instead\n", i)
 		os.Exit(1)
 	}
 	seed64 := int64(binary.LittleEndian.Uint64(seed))
 	rand.Seed(seed64)
+	needSeed = false
 }

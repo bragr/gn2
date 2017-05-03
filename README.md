@@ -1,4 +1,6 @@
 # Go Neural Network (GN2)
+BROKEN - TODO: get back to this and get it back in a working state
+
 Simple neural net and genetic algorithm implemented in Go. This is not a serious project
 but it may be helpful to you if you are just getting started with neural networks (as I am).
 

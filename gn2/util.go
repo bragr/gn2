@@ -13,6 +13,11 @@ import (
 
 var needSeed bool = true
 
+type TrainingData struct {
+	Input  [][]float64
+	Output [][]float64
+}
+
 // Return a random float64 -1.0 <= n <= 1 but only if rand has been seeded
 func randWeight() float64 {
 	if needSeed {

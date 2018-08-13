@@ -67,8 +67,8 @@ func main() {
 			difference[j] = output[j] - data.Output[i][j]
 		}
 
-		fmt.Printf("[%d] Output:\t%v\tDifference: %v\n", i, output, difference)
-		fmt.Printf("[%d] Answer:\t%v\tInput:\t\t%v\n\n", i, data.Output[i], input)
+		fmt.Printf("[%d] Output:\t%.4v\tDifference: %.4v\n", i, output, difference)
+		fmt.Printf("[%d] Answer:\t%.4v\tInput:\t\t%v\n\n", i, data.Output[i], input)
 	}
 
 }

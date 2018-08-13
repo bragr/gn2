@@ -114,8 +114,8 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 	for ; newPop < int64(len(s)); newPop++ {
 		s[newPop].Fitness = 0.0
 
-		parent1 := 1
-		parent2 := 2
+		parent1 := int64(1)
+		parent2 := int64(2)
 
 		// Get the first parent that needs a child
 		for p := int64(0); p < survivors; p++ {
@@ -142,7 +142,7 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 		net2 := s[parent2].Net.GetWeights()
 
 		for i := int64(1); i < int64(len(net1)); i += 2 {
-			net1[i] = net2[i]
+			net1[i] = (net1[i] + net2[i]) / 2
 		}
 		s[newPop].Net.SetWeights(net1)
 	}

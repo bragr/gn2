@@ -8,6 +8,12 @@ import (
 	"sort"
 )
 
+type genomeJob struct {
+	G       *genome
+	inputs  [][]float64
+	answers [][]float64
+}
+
 // An individual neural net and its fitness
 type genome struct {
 	Fitness            float64
@@ -34,11 +40,11 @@ type Species []genome
 
 // Species factory
 func NewSpecies(population, inputs, outputs, layers, neuronsPerLayer int64) Species {
-	var species Species
+	s := make(Species, 0, population)
 	for i := int64(0); i < population; i++ {
-		species = append(species, newGenome(inputs, outputs, layers, neuronsPerLayer))
+		s = append(s, newGenome(inputs, outputs, layers, neuronsPerLayer))
 	}
-	return species
+	return s
 }
 
 // Let(), Swap(), and Less() implement the sort prototype to sort based on
@@ -53,16 +59,33 @@ func (s Species) Less(i, j int) bool {
 	return s[i].Fitness < s[j].Fitness
 }
 
+func worker(workerJobs <-chan *genomeJob, done chan<- bool) {
+	for job := range workerJobs {
+		for i, input := range job.inputs {
+			outputs := job.G.Net.Update(input)
+			for j, _ := range outputs {
+				job.G.Fitness += math.Abs(job.answers[i][j] - outputs[j])
+			}
+		}
+	}
+	done <- true
+}
+
 // Feed the given input to all genomes in the species and judge their fitness
 // against the answers
 func (s Species) Compete(inputs, answers [][]float64) {
+	numWorkers := 12
+	jobs := make(chan *genomeJob, len(s))
+	done := make(chan bool)
+	for i := 0; i < numWorkers; i++ {
+		go worker(jobs, done)
+	}
 	for g, _ := range s {
-		for i, input := range inputs {
-			outputs := s[g].Net.Update(input)
-			for j, _ := range outputs {
-				s[g].Fitness += math.Abs(answers[i][j] - outputs[j])
-			}
-		}
+		jobs <- &genomeJob{&s[g], inputs, answers}
+	}
+	close(jobs)
+	for i := 0; i < numWorkers; i++ {
+		<-done
 	}
 }
 
@@ -98,19 +121,16 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 		for p := int64(0); p < survivors; p++ {
 			if childrenPerParent[p] < childRate {
 				parent1 = p
-				childrenPerParent[p] = childrenPerParent[p] + 1
+				childrenPerParent[p] += 1
 				break
 			}
-		}
-		if parent1 == -1 {
-			break
 		}
 
 		// Get the second parent that needs a child
 		for p := parent1; p < survivors; p++ {
 			if childrenPerParent[p] < childRate {
 				parent2 = p
-				childrenPerParent[p] = childrenPerParent[p] + 1
+				childrenPerParent[p] += 1
 				break
 			}
 		}

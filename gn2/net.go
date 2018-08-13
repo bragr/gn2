@@ -17,6 +17,7 @@ type neuron []float64
 // input weights and neuron bias.
 func newNeuron(numInputs int64, randomized bool) neuron {
 	var n neuron
+	n = make([]float64, 0, numInputs)
 	// One extra for the bias
 	if randomized {
 		for i := int64(0); i < numInputs+1; i++ {
@@ -54,6 +55,7 @@ type nLayer []neuron
 // inputs
 func newNeuronLayer(numNeurons, numInputs int64, randomized bool) nLayer {
 	var layer nLayer
+	layer = make([]neuron, 0, numInputs)
 	for i := int64(0); i < numNeurons; i++ {
 		layer = append(layer, newNeuron(numInputs, randomized))
 	}

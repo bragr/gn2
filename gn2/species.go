@@ -114,8 +114,8 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 	for ; newPop < int64(len(s)); newPop++ {
 		s[newPop].Fitness = 0.0
 
-		parent1 := int64(-1)
-		parent2 := int64(-1)
+		parent1 := 1
+		parent2 := 2
 
 		// Get the first parent that needs a child
 		for p := int64(0); p < survivors; p++ {

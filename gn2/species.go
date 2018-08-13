@@ -56,7 +56,7 @@ func (s Species) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s Species) Less(i, j int) bool {
-	return s[i].Fitness < s[j].Fitness
+	return s[i].Fitness > s[j].Fitness
 }
 
 func worker(workerJobs <-chan *genomeJob, done chan<- bool) {
@@ -64,7 +64,12 @@ func worker(workerJobs <-chan *genomeJob, done chan<- bool) {
 		for i, input := range job.inputs {
 			outputs := job.G.Net.Update(input)
 			for j, _ := range outputs {
-				job.G.Fitness += math.Abs(job.answers[i][j] - outputs[j])
+				//job.G.Fitness += math.Abs(job.answers[i][j] - outputs[j])
+				if job.answers[i][j] > 0.0 && outputs[j] >= 0.75 {
+					job.G.Fitness += 20.0
+				} else {
+					job.G.Fitness -= math.Abs(job.answers[i][j] - outputs[j])
+				}
 			}
 		}
 	}
@@ -92,7 +97,7 @@ func (s Species) Compete(inputs, answers [][]float64) {
 // Choose the survivors of this population. Return the species to full population by creating new
 // genomes that are mutant clones of survivors, children (interlaced copies of survivors), and, if
 // more genomes are still needed, new random genomes.
-func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
+func (s Species) Breed(survivors, mutantCopyRate, childRate int64, mutate, mutateAmount float64) {
 	sort.Sort(s)
 
 	// Survivors
@@ -105,7 +110,7 @@ func (s Species) Breed(survivors, mutantCopyRate, childRate int64) {
 	for g := newPop; g < int64(len(s)) && g < (mutantCopyRate*survivors)+newPop; g++ {
 		parent := (g - newPop) / mutantCopyRate
 		s[g].Fitness = 0.0
-		s[g].Net = s[parent].Net.Mutate(0.05, 0.3, s[g].netInputs, s[g].netOutputs, s[g].netHiddenLayers, s[g].netNeuronsPerLayer)
+		s[g].Net = s[parent].Net.Mutate(mutate, mutateAmount, s[g].netInputs, s[g].netOutputs, s[g].netHiddenLayers, s[g].netNeuronsPerLayer)
 	}
 	newPop += (mutantCopyRate * survivors)
 

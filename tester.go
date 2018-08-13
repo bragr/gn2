@@ -26,6 +26,8 @@ func main() {
 	survivors := flag.Int64("survivors", 3, "Survivors per generation")
 	mutants := flag.Int64("mutants", 3, "Mutants per survivor")
 	children := flag.Int64("children", 2, "Width of layers")
+	mutateChance := flag.Float64("mutate-chance", 0.1, "Chance of mutating")
+	mutateAmount := flag.Float64("mutate-amount", 0.3, "Amount to mutate by")
 	outputRate := flag.Int("output-rate", 10, "How many generations between updates")
 	outputFitness := flag.Bool("output-fitness", false, "Output the current fitness")
 	outputBest := flag.Bool("output-best", false, "a bool")
@@ -52,7 +54,7 @@ func main() {
 				fmt.Printf(".")
 			}
 		}
-		species.Breed(*survivors, *mutants, *children)
+		species.Breed(*survivors, *mutants, *children, *mutateChance, *mutateAmount)
 	}
 	sort.Sort(species)
 	if *outputBest {
